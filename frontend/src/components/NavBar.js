@@ -1,9 +1,14 @@
-function Navbar() {
+import { Link } from "react-router-dom";
+
+function NavBar() {
     return (
         <div style={{ padding: "10px", background: "#eee" }}>
-            <h3>Skill Swap Platform</h3>
+            <Link to="/">Home</Link> |{" "}
+            <Link to="/login">Login</Link> |{" "}
+            <Link to="/register">Register</Link> |{" "}
+            <Link to="/dashboard">Dashboard</Link>
         </div>
     );
 }
 
-export default Navbar;
+export default NavBar;
