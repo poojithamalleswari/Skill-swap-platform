@@ -1,18 +1,26 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
+import api from "../api";
 
 function Login() {
+    const { login } = useContext(AuthContext);
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!email || !password) {
-            alert("Please fill all fields");
-            return;
-        }
+        try {
+            const response = await api.post("/login", {
+                email,
+                password,
+            });
 
-        console.log("Login data:", { email, password });
+            login(response.data.user);
+        } catch (error) {
+            alert("Login failed");
+        }
     };
 
     return (
@@ -25,16 +33,14 @@ function Login() {
                     placeholder="Email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                />
-                <br />
+                /><br />
 
                 <input
                     type="password"
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                />
-                <br />
+                /><br />
 
                 <button type="submit">Login</button>
             </form>
