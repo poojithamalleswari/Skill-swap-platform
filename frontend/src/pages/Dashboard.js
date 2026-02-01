@@ -1,6 +1,6 @@
-import { useState, useContext } from "react";
-import api from "../api";
+import { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
+import api from "../api";
 
 function Dashboard() {
     const { user, token } = useContext(AuthContext);
@@ -8,25 +8,35 @@ function Dashboard() {
     const [title, setTitle] = useState("");
     const [type, setType] = useState("TEACH");
 
+    if (!user || !token) {
+        return <h3>Please login to access dashboard</h3>;
+    }
+
     const addSkill = async () => {
-        await api.post(
-            "/skills",
-            { title, type },
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            }
-        );
+        try {
+            await api.post(
+                "/skills",
+                { title, type },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
 
-        alert("Skill added");
+            alert("Skill added");
+            setTitle("");
+        } catch (err) {
+            alert("Failed to add skill");
+        }
     };
-
-    if (!user) return <h3>Please login</h3>;
 
     return (
         <div>
-            <h2>Add Skill</h2>
+            <h2>Dashboard</h2>
+            <p>Welcome, {user.email}</p>
+
+            <h3>Add Skill</h3>
 
             <input
                 placeholder="Skill title"

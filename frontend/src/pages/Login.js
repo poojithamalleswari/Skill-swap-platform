@@ -12,14 +12,15 @@ function Login() {
         e.preventDefault();
 
         try {
-            const response = await api.post("/login", {
+            const res = await api.post("/auth/login", {
                 email,
                 password,
             });
 
-            login(response.data.user);
-        } catch (error) {
-            alert("Login failed");
+            // Save user + token in context
+            login(res.data);
+        } catch (err) {
+            alert("Invalid email or password");
         }
     };
 
@@ -33,14 +34,16 @@ function Login() {
                     placeholder="Email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                /><br />
+                />
+                <br />
 
                 <input
                     type="password"
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                /><br />
+                />
+                <br />
 
                 <button type="submit">Login</button>
             </form>

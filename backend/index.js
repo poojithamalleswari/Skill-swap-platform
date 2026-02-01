@@ -10,7 +10,7 @@ const { verifyToken } = require("./middleware/authMiddleware");
 
 const app = express();
 const skillRoutes = require("./routes/skillRoutes");
-
+const swapRoutes = require("./routes/swapRoutes");
 // Middlewares
 app.use(cors());
 app.use(express.json());
@@ -30,7 +30,7 @@ app.get("/api/protected", verifyToken, (req, res) => {
     });
 });
 app.use("/api/skills", skillRoutes);
-
+app.use("/api/swaps", swapRoutes);
 // Start server
 const PORT = 5000;
 app.listen(PORT, () => {
