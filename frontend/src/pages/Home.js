@@ -1,100 +1,66 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import api from "../api";
-import { AuthContext } from "../context/AuthContext";
 
-function Dashboard() {
-    const { user, token } = useContext(AuthContext);
-    const [requests, setRequests] = useState([]);
-    const [message, setMessage] = useState("");
+function Home() {
+    const [skills, setSkills] = useState([]);
+    const [search, setSearch] = useState("");
+    const [type, setType] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
-    // Fetch incoming requests
-    const fetchRequests = () => {
-        api
-            .get("/swaps/incoming", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            })
-            .then((res) => setRequests(res.data))
-            .catch(() => setMessage("Failed to load requests"));
-    };
-
-    useEffect(() => {
-        if (token) fetchRequests();
-    }, [token]);
-
-    // Update status
-    const updateStatus = async (id, status) => {
+    const fetchSkills = async () => {
         try {
-            await api.put(
-                `/swaps/${id}`,
-                { status },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
+            setLoading(true);
+            const res = await api.get(
+                `/skills?search=${search}&type=${type}`
             );
-            fetchRequests(); // refresh
-        } catch (err) {
-            alert("Failed to update request");
+            setSkills(res.data);
+            setError("");
+        } catch {
+            setError("Failed to load skills");
+        } finally {
+            setLoading(false);
         }
     };
 
-    if (!user) return <h3>Please login to view dashboard</h3>;
+    useEffect(() => {
+        fetchSkills();
+    }, []);
 
     return (
         <div>
-            <h2>Dashboard</h2>
+            <h2>Skill Marketplace</h2>
 
-            {message && <p style={{ color: "red" }}>{message}</p>}
+            <input
+                placeholder="Search skill..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+            />
 
-            <h3>Incoming Swap Requests</h3>
+            <select
+                value={type}
+                onChange={(e) => setType(e.target.value)}
+            >
+                <option value="">All</option>
+                <option value="TEACH">Teach</option>
+                <option value="LEARN">Learn</option>
+            </select>
 
-            {requests.length === 0 && <p>No incoming requests</p>}
+            <button onClick={fetchSkills}>Search</button>
 
-            {requests.map((req) => (
-                <div
-                    key={req.id}
-                    style={{
-                        border: "1px solid gray",
-                        padding: "10px",
-                        marginBottom: "10px",
-                    }}
-                >
-                    <p>
-                        <strong>{req.requester}</strong> requested your skill{" "}
-                        <strong>{req.title}</strong>
-                    </p>
-                    <p>
-                        Status:{" "}
-                        <span style={{
-                            color: req.status === "ACCEPTED" ? "green" :
-                                req.status === "REJECTED" ? "red" : "orange"
-                        }}>
-                            {req.status}
-                        </span>
-                    </p>
-
-                    {req.status === "PENDING" && (
-                        <>
-                            <button
-                                onClick={() => updateStatus(req.id, "ACCEPTED")}
-                            >
-                                Accept
-                            </button>
-                            <button
-                                onClick={() => updateStatus(req.id, "REJECTED")}
-                                style={{ marginLeft: "10px" }}
-                            >
-                                Reject
-                            </button>
-                        </>
-                    )}
+            <hr />
+            {loading && <p>Loading...</p>}
+            {error && <p style={{ color: "red" }}>{error}</p>}
+            {skills.length === 0 && !loading && <p>No skills found</p>}
+            {skills.map((skill) => (
+                <div key={skill.id}>
+                    <strong>{skill.title}</strong> ({skill.type})
+                    <br />
+                    Posted by: {skill.email}
                 </div>
             ))}
         </div>
     );
 }
 
-export default Dashboard;
+export default Home;

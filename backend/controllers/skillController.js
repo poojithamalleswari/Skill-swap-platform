@@ -20,14 +20,30 @@ exports.addSkill = (req, res) => {
 };
 
 exports.getAllSkills = (req, res) => {
-    const query = `
+    const { search, type } = req.query;
+
+    let query = `
     SELECT skills.id, skills.title, skills.type, skills.category, users.email
     FROM skills
     JOIN users ON skills.user_id = users.id
-    ORDER BY skills.created_at DESC
+    WHERE 1=1
   `;
 
-    db.query(query, (err, results) => {
+    const params = [];
+
+    if (search) {
+        query += " AND skills.title LIKE ?";
+        params.push(`%${search}%`);
+    }
+
+    if (type) {
+        query += " AND skills.type = ?";
+        params.push(type);
+    }
+
+    query += " ORDER BY skills.created_at DESC";
+
+    db.query(query, params, (err, results) => {
         if (err) {
             return res.status(500).json({ message: "DB error" });
         }
