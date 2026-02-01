@@ -11,12 +11,14 @@ const { verifyToken } = require("./middleware/authMiddleware");
 const app = express();
 const skillRoutes = require("./routes/skillRoutes");
 const swapRoutes = require("./routes/swapRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 // Middlewares
 app.use(cors());
 app.use(express.json());
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/admin", adminRoutes);
 // Test route
 app.get("/", (req, res) => {
     res.send("Skill Swap Backend Running");

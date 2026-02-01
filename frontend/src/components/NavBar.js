@@ -17,6 +17,13 @@ function NavBar() {
             ) : (
                 <>
                     <Link to="/dashboard">Dashboard</Link> |{" "}
+
+                    {user.role === "ADMIN" && (
+                        <>
+                            <Link to="/admin">Admin</Link> |{" "}
+                        </>
+                    )}
+
                     <button onClick={logout}>Logout</button>
                 </>
             )}
